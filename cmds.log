@@ -1,0 +1,20 @@
+    1  mkdir REVIEWS
+    2  mkdir REVIEWS-LEM
+    3  mkdir REVIEWS-BAD
+    4  mkdir REVIEWS-LEM
+    5  mkdir REVIEWS-BAD-LEM
+    6  sh a4-scripts/split-top-100-cust-rev-helpf.sh amazon_book_raw.tsv REVIEWS
+    7  sh a4-scripts/split-bottom-100-cust-rev-helpf.sh amazon_book_raw.tsv REVIEWS-BAD
+    8  sh a4-scripts/lemmate-tsv.sh REVIEWS REVIEWS-LEM 5
+    9  sh a4-scripts/lemmate-tsv.sh REVIEWS-BAD REVIEWS-BAD-LEM 5
+   10  sh a4-scripts/lemmate-tweets.sh tweets.tsv 4 | head -n 100 > tweets.LEMMATED.100.tsv
+   11  ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.100.tsv"}' | time parallel-20211022/src/parallel --colsep '\t' "./a4-scripts/simtweet.sh"
+   12  ls -lm REVIEWS-BAD-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.100.tsv"}' | time parallel-20211022/src/parallel --colsep '\t' "./a4-scripts/simtweet.sh"
+   16  touch GOOD.WORDS.txt
+   17  touch BAD.WORDS.txt
+   18  ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ print $1 }' | parallel-20211022/src/parallel "./a4-scripts/comparetweet.sh" >> GOOD.WORDS.txt
+   19  ls -lm REVIEWS-BAD-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ print $1 }' | parallel-20211022/src/parallel "./a4-scripts/comparetweet.sh" >> BAD.WORDS.txt
+   20  sort -k 2 GOOD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 10
+   21  sort -k 2 BAD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 10
+   22  sort -k 2 BAD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 11
+   23  history > a4/cmds.log

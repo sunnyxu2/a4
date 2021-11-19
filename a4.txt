@@ -1,0 +1,97 @@
+NOTE: Check folder a4-scripts to see the scripts that I used
+
+Script started on 2021-11-19 05:29:54+00:00 [TERM="screen" TTY="/dev/pts/2" COLUMNS="120" LINES="29"]
+xu@f6linux15:~$ history -c
+xu@f6linux15:~$ mkdir REVIEWS
+xu@f6linux15:~$ mkdir REVIEWS-LEM
+xu@f6linux15:~$ mkdir REVIEWS-LEM[K-BAD
+xu@f6linux15:~$ mkdir REVIEWS-BAD[Kmkdir REVIEWS-BAD[K[K[KLEM
+mkdir: cannot create directory ‘REVIEWS-LEM’: File exists
+xu@f6linux15:~$ mkdir REVIEWS-LEM[K[K[KBAD-LEM
+xu@f6linux15:~$ sh a4-scripts/split[[K-top-100-cust-rev-helpf.sh amazon_vbo[K[K[Kbook_raw.tsv REVIEWS
+
+QUESTION 1:
+I wrote some specific shell scripts to get the top 100 most helpful and some bottom 100 reviews.
+
+format: <column list> <sort column> <col to name files> <num results>
+2,3,9,10,14 3 2 100
+xu@f6linux15:~$ sh a4-scripts/split-top-100-cust-rev-helpf.sh amazon_book_raw.tsv REVIEWS-BAD[1P[1P[1P[1@B[1@O[1@R[1@T[1P[1P[1P[1P[1@b[1@o[1@t[1@t[1@o[1@m
+format: <column list> <sort column> <col to name files> <num results>
+2,3,9,10,14 3 2 100
+
+QUESTION 2 and 3:
+I wrote some more specific shell scripts to "lemmatize" the reviews. 
+The lemmatization isn't perfect, and it screwed up a lot of words.
+If I wanted to do this analysis better, I'd crack open Python, to be honest.
+
+xu@f6linux15:~$ sh a4-scripts/lemmate-tsv.sh REVIEWS REVIEWS-LEM 5
+xu@f6linux15:~$ sh a4-scripts/lemmate-tsv.sh REVIEWS-BAD REVIEWS-BAD-LEM 5
+xu@f6linux15:~$ sh a4-scripts/lemmate-tweets.sh tweets.tsv 4 > tweets.LEMMATED.tsv[1@|[1@ [1@h[1@e[1@a[1@d[1@ [1@-[1@n[1@ [1@1[1@0[1@0[1@ [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.tsv1.tsv0.tsv0.tsv
+
+QUESTION 4 and 5:
+I'm really glad Prof. Andreopolous gave us two extensions because this thing took me weeks to figure out in sandbox mode.
+
+xu@f6linux15:~$ ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.100.tsv"}' | time parallel-20211022/src/parallel --colsep '\t' "./a4-scripts/simtweet.sh"
+172.73user 319.39system 0:55.64elapsed 884%CPU (0avgtext+0avgdata 22208maxresident)k
+25447864inputs+1628032outputs (183559major+14305071minor)pagefaults 0swaps
+xu@f6linux15:~$ ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.100.tsv"}' | time parallel-20211022/src/parallel --colsep '\t' "./a4-scripts/simtweet.sh"[CM[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.100[1@.M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CB-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.10[1@0M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CA-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.1[C[1@0M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CD-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | awk '{ print $1"\ttweets.LEMMATED.[1@1M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+157.43user 426.10system 1:30.44elapsed 645%CPU (0avgtext+0avgdata 21504maxresident)k
+48653072inputs+1428608outputs (355298major+14438480minor)pagefaults 0swaps
+
+It turns out that analyzing the 1st 100 tweets since April 2009 takes a really long time, especially if you do it when the IBM servers are slow at like 10 PM.
+
+QUESTION 6:
+I wrote some more shell scripts to compare the tweet words.
+
+xu@f6linux15:~$ touch GOOD.WO[K[K[K.WORDS.txt
+xu@f6linux15:~$ touch BAD.WORDS.txt
+xu@f6linux15:~$ ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ print $1 }' | parallel-20211022/src/parallel "./a4-scripts/comparetweet.sh" >> GOOD.WORDS.txt
+parallel: Warning: Starting 58 processes took > 2 sec.
+parallel: Warning: Consider adjusting -j. Press CTRL-C to stop.
+xu@f6linux15:~$ ls -lm REVIEWS-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ print $1 }' | parallel-20211022/src/parallel "./a4-scripts/comparetweet.sh" >> GOOD.WORDS.txt[1P.WORDS.txt[1P.WORDS.txt[1P.WORDS.txt[1P.WORDS.txtB.WORDS.txtA.WORDS.txtD.WORDS.txtM[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ p[1@rM[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CB-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{ [1@pM[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CA-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '{[1@ M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[CD-LEM/*.TRIMMED.txt | sed -r 's/ /\n/g' | tr -d "," | sed -r 's/.TRIMMED.txt//g' | awk '[1@{M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+xu@f6linux15:~$ sort[K[K[K[Ksort -k 2 GOOD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 10
+    767 that
+    208 one
+    196 wa
+    193 thi
+    169 all
+    160 more
+    139 they
+    138 like
+    124 work
+    124 what
+
+xu@f6linux15:~$ sort -k 2 BAD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 10
+    154 that
+    100 did something
+     90 wa
+     54 thi
+     51 one
+     46 like
+     44 all
+     33 they
+     33 book
+     32 what
+xu@f6linux15:~$ [Kxu@f6linux15:~$ sort -k 2 BAD.WORDS.txt | uniq -c | sort -k 1 -n -r | head -n 10[K1 | [K[K[K | [K[K[K
+    154 that
+    100 did something
+     90 wa
+     54 thi
+     51 one
+     46 like
+     44 all
+     33 they
+     33 book
+     32 what
+     28 really
+
+Apparently my lemmatization script missed the phrase "did something" so I'm not counting that as #2 most common word in the analysis.
+
+xu@f6linux15:~$ ^C^C
+xu@f6linux15:~$ ^C
+xu@f6linux15:~$ historu[Ky > a4/cmds.log
+xu@f6linux15:~$ exit
+
+Script done on 2021-11-19 06:17:27+00:00 [COMMAND_EXIT_CODE="0"]

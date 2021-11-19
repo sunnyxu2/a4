@@ -1,0 +1,5 @@
+echo "format: <column list> <sort column> <num results>"
+read col_list sort_col lim
+temp_file=$(mktemp) # 
+cut -f $col_list $1 | sort -k $sort_col -n -r | head -n $lim
+https://unix.stackexchange.com/questions/181937/how-create-a-temporary-file-in-shell-script

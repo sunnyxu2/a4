@@ -1,0 +1,6 @@
+echo "format: <amazon review text column> <twitter text column>
+read amazon twitter
+for FILE in $1/*.txt
+do
+	comm -12 <(tr " " "\n" <($cut -f $amazon $FILE | sort)) <(tr " " "\n" < ) | wc
+done

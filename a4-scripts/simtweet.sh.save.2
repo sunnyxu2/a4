@@ -1,0 +1,25 @@
+
+
+#!/bin/bash
+temp_ama=$(mktemp); 
+temp_twi=$(mktemp); 
+twi_len=`wc -l $2 | cut -d " " -f 1`
+sed -r 's/(\s)+/\n/g' $1 | sed -r '/^$/d' | sort > $temp_ama; 
+#sed -r 's/(\s)+/\n/g' $2 | sort > $temp_twi; 
+#comm -12 $temp_ama $temp_twi | wc -l; 
+for (( i = 1; i <= 10; i++ ))
+do
+	temp_twi_line=$(mktemp);
+	sed "${i}q;d" $2 | sed -r 's/(\s)+/\n/g' | sed -r '/^$/d' | sort > $temp_twi_line;
+	shared_words=comm -12 $temp_ama $temp_twi_line | wc -l`;
+	if ($shared_words>=2);
+	then
+		echo "yes";
+	else
+		echo "no";
+	fi
+	rm $temp_twi_line 
+done
+rm $temp_ama; 
+#rm $temp_twi; 
+

@@ -1,0 +1,16 @@
+
+#!/bin/bash
+temp_ama=$(mktemp); 
+temp_twi=$(mktemp); 
+twi_len=`wc -l $2`
+sed -r 's/(\s)+/\n/g' $1 | sort > $temp_ama; 
+#sed -r 's/(\s)+/\n/g' $2 | sort > $temp_twi; 
+#comm -12 $temp_ama $temp_twi | wc -l; 
+for i in {1..$twi_len}
+do
+	#shared_words=`comm -12 $temp_ama `sed "${i}q;d" $2``;
+	
+	#echo $shared_words; 
+done
+rm $temp_ama; 
+#rm $temp_twi; 
